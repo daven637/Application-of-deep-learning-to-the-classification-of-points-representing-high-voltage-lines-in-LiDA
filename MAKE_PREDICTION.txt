@@ -1,0 +1,141 @@
+import numpy as np
+import laspy
+from numpy import load
+import numpy as np
+import tensorflow as tf
+import pandas as pd
+import laspy
+import sys
+import tensorflow as tf
+from tensorflow import keras
+import os
+import tempfile
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib as mpl
+import sklearn
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import Sequential, save_model, load_model
+
+
+
+#READ_DATA
+TEST_DATA = laspy.read("vall_small.las")
+
+TEST_DATA_intensity=TEST_DATA.intensity
+TEST_DATA_intensity=np.array(TEST_DATA_intensity)
+TEST_DATA_intensity=TEST_DATA_intensity.reshape(-1,1)
+
+TEST_DATA_x=TEST_DATA.x
+TEST_DATA_x=np.array(TEST_DATA_x)
+#TEST_DATA_x=TEST_DATA_x-np.min(TEST_DATA_x)
+
+TEST_DATA_x=TEST_DATA_x.reshape(-1,1)
+
+TEST_DATA_y=TEST_DATA.y
+TEST_DATA_y=np.array(TEST_DATA_y)
+#TEST_DATA_y=TEST_DATA_y-np.min(TEST_DATA_y)
+TEST_DATA_y=TEST_DATA_y.reshape(-1,1)
+
+TEST_DATA_z=TEST_DATA.z
+TEST_DATA_z=TEST_DATA_z
+TEST_DATA_z=np.array(TEST_DATA_z)
+TEST_DATA_z=TEST_DATA_z.reshape(-1,1)
+
+TEST_DATA_return_number=TEST_DATA.return_number
+TEST_DATA_return_number=np.array(TEST_DATA_return_number)
+TEST_DATA_return_number=TEST_DATA_return_number.reshape(-1,1)
+
+TEST_DATA_number_of_return=TEST_DATA.number_of_returns
+TEST_DATA_number_of_return=np.array(TEST_DATA_number_of_return)
+TEST_DATA_number_of_return=TEST_DATA_number_of_return.reshape(-1,1)
+
+TEST_DATA_scan_angle=TEST_DATA.scan_direction_flag
+TEST_DATA_scan_angle=np.array(TEST_DATA_scan_angle)
+TEST_DATA_scan_angle=TEST_DATA_scan_angle.reshape(-1,1)
+###DROP_COLUMN
+TEST_DATA_classification=TEST_DATA.classification
+TEST_DATA_classification=np.array(TEST_DATA_classification)
+TEST_DATA_classification=TEST_DATA_classification.reshape(-1,1)
+
+TEST_DATA_red=TEST_DATA.red
+TEST_DATA_red=np.array(TEST_DATA_red)
+TEST_DATA_red=TEST_DATA_red.reshape(-1,1)
+
+TEST_DATA_green=TEST_DATA.green
+TEST_DATA_green=np.array(TEST_DATA_green)
+TEST_DATA_green=TEST_DATA_green.reshape(-1,1)
+
+TEST_DATA_blue=TEST_DATA.blue
+TEST_DATA_blue=np.array(TEST_DATA_blue)
+TEST_DATA_blue=TEST_DATA_blue.reshape(-1,1)
+
+
+CLASS=14
+TEST_DATA_true=TEST_DATA_classification==CLASS
+TEST_DATA_true=TEST_DATA_true*1
+print(TEST_DATA_true)
+print("NUMBER_OF_POINTS_IN_CLASS",np.sum(TEST_DATA_true))
+
+
+DATA=np.column_stack((TEST_DATA_x,TEST_DATA_y,TEST_DATA_z,TEST_DATA_red,TEST_DATA_green,TEST_DATA_blue))
+TEST_MODEL=np.column_stack((TEST_DATA_z,TEST_DATA_intensity,TEST_DATA_return_number,TEST_DATA_number_of_return,TEST_DATA_red,TEST_DATA_green,TEST_DATA_blue))#,TEST_DATA_return_number,TEST_DATA_number_of_return,TEST_DATA_scan_angle))# wygaszone kolumny z danymi, dopasowuje to w zaleznosci do skryptu uczacego,las_test_14_red,las_test_14_green,las_test_14_blue))#,las_test_14_classification))
+row,column=TEST_MODEL.shape
+split=2
+TEST_MODEL_1,TEST_MODEL_2 = TEST_MODEL[:split,:],TEST_MODEL[split:,:]
+
+print(row)
+print(row/3)
+TEST_MODEL_NON_SCALE=TEST_MODEL
+filepath = 'MODEL'
+model = load_model(filepath, compile = True)
+#SCALE
+scaler = MinMaxScaler(feature_range=(0 ,1))
+TEST_MODEL=scaler.fit_transform(TEST_MODEL)
+# TEST_MODEL_1=scaler.fit_transform(TEST_MODEL_1)
+# TEST_MODEL_2=scaler.fit_transform(TEST_MODEL_2)
+
+TEST_PREDICITON = model.predict(TEST_MODEL)
+
+
+
+# TEST_PREDICITON_2=model.predict(TEST_MODEL_2)
+#
+#
+
+np.savetxt('TEST_PREDICITON.txt', TEST_PREDICITON, delimiter=',')
+# TEST_PREDICITON_1=np.array(TEST_PREDICITON_1)
+# TEST_PREDICITON_2=np.array(TEST_PREDICITON_2)
+
+#PREDICTION
+prediction_classes = [
+    1 if prob > 0.7 else 0 for prob in np.ravel(TEST_PREDICITON)]
+#
+
+
+#
+
+
+print(TEST_PREDICITON)
+POSITION_OF_CORRECT_POINTS=np.nonzero(prediction_classes)
+
+
+POSITION_OF_CORRECT_POINTS_CLASS_14=np.nonzero(TEST_DATA_true)
+print("POSITION_OF_CORRECT_POINTS",POSITION_OF_CORRECT_POINTS)
+print("SUMA_SKLASYFIKOWANYCH_PUNKTOW",np.sum(prediction_classes))
+print("POSITION_OF_CORRECT_POINTS_CLASS_14",POSITION_OF_CORRECT_POINTS_CLASS_14)
+print("NUMBER_OF_POINTS_IN_CLASS_14",np.sum(POSITION_OF_CORRECT_POINTS_CLASS_14))
+
+
+CHOOSE_POINTS_FROM_CLASS=DATA[POSITION_OF_CORRECT_POINTS]
+np.savetxt('TEST_DATA_POINT_POSITION_TEST_DATA_CLASS.txt', CHOOSE_POINTS_FROM_CLASS, delimiter=',')
+TEST_MODEL_NON_SCALE=TEST_MODEL_NON_SCALE[POSITION_OF_CORRECT_POINTS]
+print(TEST_MODEL_NON_SCALE)
+print(TEST_MODEL_NON_SCALE.shape)
+np.savetxt('TEST_MODEL_NON_SCALE.txt', TEST_MODEL_NON_SCALE, delimiter=',')

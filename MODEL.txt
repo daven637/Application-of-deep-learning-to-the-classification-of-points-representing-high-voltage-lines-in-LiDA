@@ -1,0 +1,437 @@
+from numpy import load
+import numpy as np
+import tensorflow as tf
+import pandas as pd
+import laspy
+import sys
+import tensorflow as tf
+from tensorflow import keras
+import os
+import tempfile
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib as mpl
+import sklearn
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import Sequential, save_model, load_model
+
+#SET ACCURANCY NUMPY
+np.set_printoptions(suppress=True)
+#SET PLOT PARAMETRS
+mpl.rcParams['figure.figsize'] = (12, 10)
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+#READ FILE
+TRAIN_DATA = laspy.read("TRAIN_DATA.las")
+#SET HEADING LAS FILE
+point_format = TRAIN_DATA.point_format
+point=TRAIN_DATA.points
+HEADING=list(point_format.dimension_names)
+
+
+TRAIN_DATA_intensity=TRAIN_DATA.intensity
+TRAIN_DATA_intensity=np.array(TRAIN_DATA_intensity)
+TRAIN_DATA_intensity=TRAIN_DATA_intensity.reshape(-1,1)
+
+TRAIN_DATA_x=TRAIN_DATA.x
+TRAIN_DATA_x=np.array(TRAIN_DATA_x)
+#TRAIN_DATA_x=TRAIN_DATA_x-np.min(TRAIN_DATA_x)
+print(TRAIN_DATA_x)
+TRAIN_DATA_x=TRAIN_DATA_x.reshape(-1,1)
+
+TRAIN_DATA_y=TRAIN_DATA.y
+TRAIN_DATA_y=np.array(TRAIN_DATA_y)
+#TRAIN_DATA_y=TRAIN_DATA_y-np.min(TRAIN_DATA_y)
+TRAIN_DATA_y=TRAIN_DATA_y.reshape(-1,1)
+
+TRAIN_DATA_z=TRAIN_DATA.z
+TRAIN_DATA_z=TRAIN_DATA_z
+TRAIN_DATA_z=np.array(TRAIN_DATA_z)
+TRAIN_DATA_z=TRAIN_DATA_z.reshape(-1,1)
+
+TRAIN_DATA_return_number=TRAIN_DATA.return_number
+TRAIN_DATA_return_number=np.array(TRAIN_DATA_return_number)
+TRAIN_DATA_return_number=TRAIN_DATA_return_number.reshape(-1,1)
+
+TRAIN_DATA_number_of_return=TRAIN_DATA.number_of_returns
+TRAIN_DATA_number_of_return=np.array(TRAIN_DATA_number_of_return)
+TRAIN_DATA_number_of_return=TRAIN_DATA_number_of_return.reshape(-1,1)
+
+TRAIN_DATA_scan_angle=TRAIN_DATA.scan_direction_flag
+TRAIN_DATA_scan_angle=np.array(TRAIN_DATA_scan_angle)
+TRAIN_DATA_scan_angle=TRAIN_DATA_scan_angle.reshape(-1,1)
+
+TRAIN_DATA_classification=TRAIN_DATA.classification
+TRAIN_DATA_classification=np.array(TRAIN_DATA_classification)
+TRAIN_DATA_classification=TRAIN_DATA_classification.reshape(-1,1)
+
+TRAIN_DATA_red=TRAIN_DATA.red
+TRAIN_DATA_red=np.array(TRAIN_DATA_red)
+TRAIN_DATA_red=TRAIN_DATA_red.reshape(-1,1)
+
+TRAIN_DATA_green=TRAIN_DATA.green
+TRAIN_DATA_green=np.array(TRAIN_DATA_green)
+TRAIN_DATA_green=TRAIN_DATA_green.reshape(-1,1)
+
+TRAIN_DATA_blue=TRAIN_DATA.blue
+TRAIN_DATA_blue=np.array(TRAIN_DATA_blue)
+TRAIN_DATA_blue=TRAIN_DATA_blue.reshape(-1,1)
+
+TRAIN_DATA_2 = laspy.read("vall_small.las")
+#READ HEADING LAS FILE
+point_format = TRAIN_DATA_2.point_format
+point=TRAIN_DATA_2.points
+HEADING=list(point_format.dimension_names)
+print(HEADING)
+
+TRAIN_DATA_2_intensity=TRAIN_DATA_2.intensity
+TRAIN_DATA_2_intensity=np.array(TRAIN_DATA_2_intensity)
+TRAIN_DATA_2_intensity=TRAIN_DATA_2_intensity.reshape(-1,1)
+
+TRAIN_DATA_2_x=TRAIN_DATA_2.x
+TRAIN_DATA_2_x=np.array(TRAIN_DATA_2_x)
+#TRAIN_DATA_2_x=TRAIN_DATA_2_x-np.min(TRAIN_DATA_2_x)
+print(TRAIN_DATA_2_x)
+TRAIN_DATA_2_x=TRAIN_DATA_2_x.reshape(-1,1)
+
+TRAIN_DATA_2_y=TRAIN_DATA_2.y
+TRAIN_DATA_2_y=np.array(TRAIN_DATA_2_y)
+#TRAIN_DATA_2_y=TRAIN_DATA_2_y-np.min(TRAIN_DATA_2_y)
+TRAIN_DATA_2_y=TRAIN_DATA_2_y.reshape(-1,1)
+
+TRAIN_DATA_2_z=TRAIN_DATA_2.z
+TRAIN_DATA_2_z=TRAIN_DATA_2_z
+TRAIN_DATA_2_z=np.array(TRAIN_DATA_2_z)
+TRAIN_DATA_2_z=TRAIN_DATA_2_z.reshape(-1,1)
+
+TRAIN_DATA_2_return_number=TRAIN_DATA_2.return_number
+TRAIN_DATA_2_return_number=np.array(TRAIN_DATA_2_return_number)
+TRAIN_DATA_2_return_number=TRAIN_DATA_2_return_number.reshape(-1,1)
+
+TRAIN_DATA_2_number_of_return=TRAIN_DATA_2.number_of_returns
+TRAIN_DATA_2_number_of_return=np.array(TRAIN_DATA_2_number_of_return)
+TRAIN_DATA_2_number_of_return=TRAIN_DATA_2_number_of_return.reshape(-1,1)
+
+TRAIN_DATA_2_scan_angle=TRAIN_DATA_2.scan_direction_flag
+TRAIN_DATA_2_scan_angle=np.array(TRAIN_DATA_2_scan_angle)
+TRAIN_DATA_2_scan_angle=TRAIN_DATA_2_scan_angle.reshape(-1,1)
+
+TRAIN_DATA_2_classification=TRAIN_DATA_2.classification
+TRAIN_DATA_2_classification=np.array(TRAIN_DATA_2_classification)
+TRAIN_DATA_2_classification=TRAIN_DATA_2_classification.reshape(-1,1)
+
+TRAIN_DATA_2_red=TRAIN_DATA_2.red
+TRAIN_DATA_2_red=np.array(TRAIN_DATA_2_red)
+TRAIN_DATA_2_red=TRAIN_DATA_2_red.reshape(-1,1)
+
+TRAIN_DATA_2_green=TRAIN_DATA_2.green
+TRAIN_DATA_2_green=np.array(TRAIN_DATA_2_green)
+TRAIN_DATA_2_green=TRAIN_DATA_2_green.reshape(-1,1)
+
+TRAIN_DATA_2_blue=TRAIN_DATA_2.blue
+TRAIN_DATA_2_blue=np.array(TRAIN_DATA_2_blue)
+TRAIN_DATA_2_blue=TRAIN_DATA_2_blue.reshape(-1,1)
+
+
+
+
+
+TRAIN_DATA_x=np.vstack((TRAIN_DATA_z,TRAIN_DATA_2_x))
+TRAIN_DATA_y=np.vstack((TRAIN_DATA_z,TRAIN_DATA_2_y))
+TRAIN_DATA_z=np.vstack((TRAIN_DATA_z,TRAIN_DATA_2_z))
+TRAIN_DATA_intensity=np.vstack((TRAIN_DATA_intensity,TRAIN_DATA_2_intensity))
+TRAIN_DATA_return_number=np.vstack((TRAIN_DATA_return_number,TRAIN_DATA_2_return_number))
+TRAIN_DATA_number_of_return=np.vstack((TRAIN_DATA_number_of_return,TRAIN_DATA_2_number_of_return))
+TRAIN_DATA_red=np.vstack((TRAIN_DATA_red,TRAIN_DATA_2_red))
+TRAIN_DATA_green=np.vstack((TRAIN_DATA_green,TRAIN_DATA_2_green))
+TRAIN_DATA_blue=np.vstack((TRAIN_DATA_blue,TRAIN_DATA_2_blue))
+TRAIN_DATA_classification=np.vstack((TRAIN_DATA_classification,TRAIN_DATA_2_classification))
+
+
+
+
+
+##################################################################################################################
+#SET A CLASS TO LEARN MODEL, IN THIS EXAMPLE I CHOSE CLASS NUMBER 14
+CLASS=14
+
+TRAIN_DATA_true=TRAIN_DATA_classification==CLASS
+TRAIN_DATA_true=TRAIN_DATA_true*1
+#NUMBER OF POINTS WHICH HAVE CLASS NUMBER 14
+print("NUMBER_OF_POINTS",CLASS,np.sum(TRAIN_DATA_true))
+
+############TEST
+
+TRAIN_DATA_kolumny=np.column_stack((TRAIN_DATA_z,TRAIN_DATA_intensity,TRAIN_DATA_return_number,TRAIN_DATA_number_of_return,TRAIN_DATA_classification,TRAIN_DATA_true,TRAIN_DATA_red,TRAIN_DATA_green,TRAIN_DATA_blue))#,TRAIN_DATA_return_number,TRAIN_DATA_number_of_return,TRAIN_DATA_scan_angle))#,TRAIN_DATA_red,TRAIN_DATA_green,TRAIN_DATA_blue))
+
+ ## TRAIN_DATA_y,,TRAIN_DATA_intensity TRAIN_DATA_y,
+np.set_printoptions(suppress=True)
+
+
+
+
+#################################################
+
+#PREPARE DATA TO LEARN MODEL
+
+dane_df=pd.DataFrame(TRAIN_DATA_kolumny,columns=['z','intensity','return_of_number','number_of_retuns','classification',"LEARN_COLUMN","red","green","blue",])#,'return_of_number','number_of_retuns','scan_angle'])#
+#DROP COLUMN
+
+
+dane_df.pop('classification')
+
+neg, pos = np.bincount(dane_df['LEARN_COLUMN'])
+total = neg + pos
+print('Examples:\n    Total: {}\n    Positive: {} ({:.2f}% of total)\n'.format(
+    total, pos, 100 * pos / total))
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+# DATA PREPARE TO VALIDATION, LEARN
+LEARN_df, TEST_df = train_test_split(dane_df, test_size=0.2)
+LEARN_df, VALIDATION_df = train_test_split(LEARN_df, test_size=0.2)
+
+NON_SCALE_DATA_TEST_df=TEST_df.to_numpy()
+
+print("TEST_DF",TEST_df)
+#CREATE LEARN COLUMN
+LEARN_labels = np.array(LEARN_df.pop('LEARN_COLUMN'))
+bool_train_labels = LEARN_labels != 0
+VALIDATION_labels = np.array(VALIDATION_df.pop('LEARN_COLUMN'))
+TEST_labels = np.array(TEST_df.pop('LEARN_COLUMN'))
+
+print("TEST",TEST_labels.shape)
+LEARN_features = np.array(LEARN_df)
+VALIDATION_features = np.array(VALIDATION_df)
+TEST_features = np.array(TEST_df)
+
+print("TEST_LABEL",TEST_labels)
+print("test_label_Shape",TEST_labels.shape)
+#SCALE
+scaler = MinMaxScaler(feature_range=(0,1))
+LEARN_features = scaler.fit_transform(LEARN_features)
+
+VALIDATION_features = scaler.transform(VALIDATION_features)
+TEST_features = scaler.transform(TEST_features)
+
+# TEST_features = np.clip(TEST_features, -5, 5)
+# VALIDATION_features = np.clip(VALIDATION_features, -5, 5)
+# TEST_features = np.clip(TEST_features, -5, 5)
+
+#DATA SHAPE
+print('LEARN labels shape:', LEARN_labels.shape)
+print('VALIDATION labels shape:', VALIDATION_labels.shape)
+print('TEST labels shape:', TEST_labels.shape)
+
+print('TRAIN features shape:', LEARN_features.shape)
+print('VALIDATION features shape:', VALIDATION_features.shape)
+print('TEST features shape:', TEST_features.shape)
+
+pos_df = pd.DataFrame(LEARN_features[ bool_train_labels], columns=LEARN_df.columns)
+neg_df = pd.DataFrame(LEARN_features[~bool_train_labels], columns=LEARN_df.columns)
+#DEF
+METRICS = [
+      keras.metrics.TruePositives(name='tp'),
+      keras.metrics.FalsePositives(name='fp'),
+      keras.metrics.TrueNegatives(name='tn'),
+      keras.metrics.FalseNegatives(name='fn'),
+      keras.metrics.BinaryAccuracy(name='accuracy'),
+      keras.metrics.Precision(name='precision'),
+      keras.metrics.Recall(name='recall'),
+      keras.metrics.AUC(name='auc'),
+      keras.metrics.AUC(name='prc', curve='PR'), # precision-recall curve
+
+]
+print(LEARN_features.shape[-1])
+#MODEL DEFINITION
+def make_model(metrics=METRICS, output_bias=None):
+  if output_bias is not None:
+    output_bias = tf.keras.initializers.Constant(output_bias)
+
+    #
+    # model = keras.Sequential([
+    #   keras.layers.Dense(
+    #     128
+    #       , activation='relu',
+    #       input_shape=(LEARN_features.shape[-1],)),
+    #   keras.layers.Dropout(0.2),
+    #   keras.layers.Dense(1, activation='sigmoid',
+    #                      bias_initializer=output_bias),
+
+
+      # ,
+  # model = keras.Sequential([
+  #     keras.layers.Dense(512, activation='relu', input_shape=(LEARN_features.shape[-1],)),
+  #     keras.layers.Dense(512, activation='relu'),
+  #     keras.layers.Dense(512, activation='relu'),
+  #     keras.layers.Dense(256 ,activation = 'relu'),
+  #       keras.layers.Dense(256, activation='relu'),
+  #     keras.layers.Dense(128, activation='relu'),
+  #     keras.layers.Dropout(0.2),
+  #       keras.layers.Dense(1, activation='sigmoid',
+                        #@# bias_initializer=output_bias,)])
+
+
+  model = keras.Sequential([
+      keras.layers.Dense(128, activation='relu', input_shape=(LEARN_features.shape[-1],)),
+      keras.layers.Dense(64, activation='relu'),
+        keras.layers.Dropout(0.2),
+
+        keras.layers.Dense(1, activation='sigmoid',
+                         bias_initializer=output_bias,)])
+  model.compile(
+      optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+      loss=keras.losses.BinaryCrossentropy(),
+      metrics=metrics)
+
+  return model
+
+################
+EPOCHS = 100
+BATCH_SIZE = 2048
+#zatrzymanie dzialania modelu, gdy nie jest zwiekszana dokladnosc
+early_stopping = tf.keras.callbacks.EarlyStopping(
+    monitor='val_prc',
+    verbose=1,
+    patience=10,
+    mode='max',
+    restore_best_weights=True)
+
+#MODEL SUMMARY
+model = make_model()
+model.summary()
+
+#PREDITION 10
+model.predict(LEARN_features[:10])
+results = model.evaluate(LEARN_features, LEARN_labels, batch_size=BATCH_SIZE, verbose=0)
+print("Loss: {:0.4f}".format(results[0]))
+initial_bias = np.log([pos/neg])
+print(initial_bias)
+initial_weights = os.path.join(tempfile.mkdtemp(), 'initial_weights')
+model.save_weights(initial_weights)
+#CREATE MODEL
+model = make_model()
+model.load_weights(initial_weights)
+model.layers[-1].bias.assign([0.0])
+zero_bias_history = model.fit(
+    LEARN_features,
+    LEARN_labels,
+    batch_size=BATCH_SIZE,
+    epochs=100,
+    validation_data=(VALIDATION_features, VALIDATION_labels),
+    verbose=0)
+
+model = make_model()
+model.load_weights(initial_weights)
+careful_bias_history = model.fit(
+    LEARN_features,
+    LEARN_labels,
+    batch_size=BATCH_SIZE,
+    epochs=100,
+    validation_data=(VALIDATION_features, VALIDATION_labels),
+    verbose=0)
+#TRAIN_PLOT
+def plot_loss(history, label, n):
+  # Use a log scale on y-axis to show the wide range of values.
+  plt.semilogy(history.epoch, history.history['loss'],
+               color=colors[n], label='Train ' + label)
+  plt.semilogy(history.epoch, history.history['val_loss'],
+               color=colors[n], label='Val ' + label,
+               linestyle="--")
+  plt.xlabel('Epoch')
+  plt.ylabel('Loss')
+
+plot_loss(zero_bias_history, "Zero Bias", 0)
+plot_loss(careful_bias_history, "Careful Bias", 1)
+plt.legend()
+#plt.show()
+
+#LEARN MODEL
+model = make_model()
+model.load_weights(initial_weights)
+baseline_history = model.fit(
+    LEARN_features,
+    LEARN_labels,
+    batch_size=BATCH_SIZE,
+    epochs=EPOCHS,
+    callbacks=[early_stopping],
+    validation_data=(VALIDATION_features,VALIDATION_labels))
+
+def plot_metrics(history):
+  metrics = ['loss', 'prc', 'precision', 'recall']
+  for n, metric in enumerate(metrics):
+    name = metric.replace("_"," ").capitalize()
+    plt.subplot(2,2,n+1)
+    plt.plot(history.epoch, history.history[metric], color=colors[0], label='Train')
+    plt.plot(history.epoch, history.history['val_'+metric],
+             color=colors[0], linestyle="--", label='Val')
+    plt.xlabel('Epoch')
+    plt.ylabel(name)
+    if metric == 'loss':
+      plt.ylim([0, plt.ylim()[1]])
+    elif metric == 'auc':
+      plt.ylim([0.8,1])
+    else:
+      plt.ylim([0,1])
+
+
+# plt.plot(baseline_history.epoch, baseline_history.history[METRICS], color=colors[0], label='Train')
+# plt.plot(baseline_history.epoch, baseline_history.history['val_'+METRICS],
+#              color=colors[0], linestyle="--", label='Val')
+# plt.legend()
+# plt.show()
+
+
+
+
+train_predictions_baseline = model.predict(LEARN_features, batch_size=BATCH_SIZE)
+test_predictions_baseline = model.predict(LEARN_features, batch_size=BATCH_SIZE)
+
+
+
+# Save the model
+filepath = 'model'
+save_model(model, filepath)
+
+
+#TEST_DATA PREDICTION
+print(TEST_df)
+scaler = MinMaxScaler(feature_range=(0 ,1)) #StandardScaler()
+test_df=scaler.fit_transform(TEST_df)
+
+predict=model.predict(test_df)
+predict=np.array(predict)
+#CLASS PREDICTION
+prediction_classes = [
+    1 if prob > 0.5 else 0 for prob in np.ravel(predict)]
+np.set_printoptions(suppress=True)
+prediction_classes=np.array(prediction_classes)
+
+#
+# accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+# print("Test data accuracy:", accuracy.eval({test_df, TEST_labels}))
+# print("Valid data accuracy:", accuracy.eval({VALIDATION_features, VALIDATION_labels}))
+
+
+
+POINT_PREDICTION_TO_CLASS=np.nonzero(prediction_classes)
+
+#test lablels
+TEST_POINTS_WHICH_BELONG_TO_CLASS=np.nonzero(TEST_labels)
+
+
+NON_SCALE_DATAtest_df=np.array(NON_SCALE_DATA_TEST_df)
+CHOOSE_POINTS_CLASS_TRAIN_DATA=NON_SCALE_DATAtest_df[POINT_PREDICTION_TO_CLASS]
+NON_SCALE_DATAtest_df=NON_SCALE_DATAtest_df[TEST_POINTS_WHICH_BELONG_TO_CLASS]
+#SAVE_TO_TXT
+np.savetxt('POINT_PREDICTION_TO_CLASS.txt', POINT_PREDICTION_TO_CLASS, delimiter=',')
+np.savetxt('POINT_PREDICTION_TO_CLASS_TEST_DATA.txt', TEST_POINTS_WHICH_BELONG_TO_CLASS, delimiter=',')
+np.savetxt('TEST_DATA_PREDICTION_BY_MODEL.txt', CHOOSE_POINTS_CLASS_TRAIN_DATA, delimiter=',')
+
+
+
